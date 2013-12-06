@@ -16,14 +16,17 @@ public class NotifyMessage {
 
     private final BackgroundColor bgColor;
     private final String message;
+    private final boolean notify;
 
-    public NotifyMessage(BackgroundColor bgColor, String message) {
+    public NotifyMessage(BackgroundColor bgColor, String message, boolean notify) {
         this.bgColor = bgColor;
         this.message = message;
+        this.notify = notify;
+
     }
 
     public NotifyMessage(String message) {
-        this(BackgroundColor.red, message);
+        this(BackgroundColor.red, message, true);
     }
 
     public BackgroundColor getBackgroundColor() {
@@ -38,7 +41,7 @@ public class NotifyMessage {
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("color", this.getBackgroundColor().name());
         map.put("message", this.getMessage());
-        map.put("notify", Boolean.valueOf(false));
+        map.put("notify", Boolean.valueOf(this.notify));
         map.put("message_format", "text");
         return JSONObject.fromObject(map);
     }

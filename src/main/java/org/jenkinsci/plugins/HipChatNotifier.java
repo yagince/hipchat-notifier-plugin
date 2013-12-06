@@ -5,6 +5,7 @@ import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
@@ -31,7 +32,8 @@ import java.io.PrintStream;
 public class HipChatNotifier extends Notifier {
 
     public final String room;
-    public final String messageFormat;
+    public final String successMessageFormat;
+    public final String failedMessageFormat;
     public final boolean postSuccess;
     public final boolean notifySuccess;
     public final boolean postFailed;
@@ -40,7 +42,8 @@ public class HipChatNotifier extends Notifier {
     @DataBoundConstructor
     public HipChatNotifier(
             String room,
-            String messageFormat,
+            String successMessageFormat,
+            String failedMessageFormat,
             boolean postSuccess,
             boolean notifySuccess,
             boolean postFailed,
@@ -51,32 +54,56 @@ public class HipChatNotifier extends Notifier {
         this.notifySuccess = notifySuccess;
         this.postFailed = postFailed;
         this.notifyFailed = notifyFailed;
-        this.messageFormat = messageFormat;
+        this.successMessageFormat = successMessageFormat;
+        this.failedMessageFormat = failedMessageFormat;
     }
 
     public String getRoom() {
         return room;
     }
 
+    private boolean shouldPost(AbstractBuild build) {
+        Result result = build.getResult();
+        return (result.isBetterOrEqualTo(Result.SUCCESS) && this.postSuccess)
+                || (result.isWorseThan(Result.SUCCESS) && this.postFailed);
+    }
+
+    private boolean shouldNotify(AbstractBuild build) {
+        Result result = build.getResult();
+        return (result.isBetterOrEqualTo(Result.SUCCESS) && this.notifySuccess)
+                || (result.isWorseThan(Result.SUCCESS) && this.notifyFailed);
+    }
+
+    private String messageFormat(AbstractBuild build) {
+        Result result = build.getResult();
+        if (result.isBetterOrEqualTo(Result.SUCCESS)) {
+            return this.successMessageFormat;
+        } else {
+            return this.failedMessageFormat;
+        }
+    }
+
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
-        String token = this.getDescriptor().getToken();
+        String token = getDescriptor().getToken();
 
-        System.out.println(token);
-        System.out.println(this.getRoom());
-        if (token.length() > 0 && this.getRoom().length() > 0) {
+        logger.println("HipChat Post   : " + shouldPost(build));
+        logger.println("HipChat Notify : " + shouldNotify(build));
+
+        if (token.length() > 0 && getRoom().length() > 0 && shouldPost(build)) {
             boolean notifyResult = new HipChat(token).notify(
-                    this.getRoom(),
+                    getRoom(),
                     new NotifyMessage(
                             NotifyMessage.BackgroundColor.get(build.getResult().color),
-                            Macro.expand(this.messageFormat, build)
+                            Macro.expand(messageFormat(build), build),
+                            shouldNotify(build)
                     )
             );
             if (notifyResult) {
-                logger.println("HipChat Notify OK");
+                logger.println("HipChat Notification OK");
             } else {
-                logger.println("HipChat Notify Failed");
+                logger.println("HipChat Notification Failed");
             }
         } else {
             logger.println("HipChatNotifier InvalidSettings.");
