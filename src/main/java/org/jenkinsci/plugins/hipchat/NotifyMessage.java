@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.hipchat.client;
+package org.jenkinsci.plugins.hipchat;
 
 import hudson.model.BallColor;
 import net.sf.json.JSONObject;
@@ -38,7 +38,7 @@ public class NotifyMessage {
         HashMap<String, Object> map = new HashMap<String, Object>();
         map.put("color", this.getBackgroundColor().name());
         map.put("message", this.getMessage());
-        map.put("notify", Boolean.valueOf(true));
+        map.put("notify", Boolean.valueOf(false));
         map.put("message_format", "text");
         return JSONObject.fromObject(map);
     }

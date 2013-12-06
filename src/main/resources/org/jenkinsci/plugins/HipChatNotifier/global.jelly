@@ -12,10 +12,6 @@
     so it should be straightforward to find them.
   -->
   <f:section title="Hip Chat Notifier">
-    <f:entry title="JenkinsURL" field="jenkins_url"
-      description="JenkinsURL ex) http://example.com/jenkins/">
-      <f:textbox default="http://localhost:8080/jenkins/"/>
-    </f:entry>
     <f:entry title="API Token" field="token"
       description="HipChat API Token">
       <f:textbox />

@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.hipchat;
+package org.jenkinsci.plugins;
 
 import hudson.Extension;
 import hudson.Launcher;
@@ -11,8 +11,8 @@ import hudson.tasks.Notifier;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
 import net.sf.json.JSONObject;
-import org.jenkinsci.plugins.hipchat.client.HipChat;
-import org.jenkinsci.plugins.hipchat.client.NotifyMessage;
+import org.jenkinsci.plugins.hipchat.HipChat;
+import org.jenkinsci.plugins.hipchat.NotifyMessage;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -30,18 +30,24 @@ import java.io.PrintStream;
  */
 public class HipChatNotifier extends Notifier {
 
-    private final String room;
+    private static final String NOTIFY_TEMPLATE = "${JOB_NAME} #${BUILD_NUMBER} (${BUILD_RESULT}) ${BUILD_URL}";
+
+    public final String room;
+    public final String messageFormat;
 
     @DataBoundConstructor
-    public HipChatNotifier(String room) {
+    public HipChatNotifier(String room, String messageFormat) {
         this.room = room;
+        if (messageFormat != null && messageFormat.length() > 0) {
+            this.messageFormat = messageFormat;
+        } else {
+            this.messageFormat = NOTIFY_TEMPLATE;
+        }
     }
 
     public String getRoom() {
         return room;
     }
-
-    private static final String NOTIFY_TEMPLATE = "%s #%s (%s) %s";
 
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
@@ -53,13 +59,7 @@ public class HipChatNotifier extends Notifier {
                     this.getRoom(),
                     new NotifyMessage(
                             NotifyMessage.BackgroundColor.get(build.getResult().color),
-                            String.format(
-                                    NOTIFY_TEMPLATE,
-                                    build.getProject().getName(),
-                                    build.getNumber(),
-                                    build.getResult().toString(),
-                                    this.getDescriptor().getJenkinsUrl() + build.getProject().getUrl() + build.getNumber()
-                            )
+                            Macro.expand(this.messageFormat, build)
                     )
             );
             if (notifyResult) {
@@ -85,7 +85,6 @@ public class HipChatNotifier extends Notifier {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         private String token;
-        private String jenkinsUrl;
 
         /**
          * In order to load the persisted global configuration, you have to
@@ -99,10 +98,6 @@ public class HipChatNotifier extends Notifier {
             return token;
         }
 
-        public String getJenkinsUrl() {
-            return jenkinsUrl;
-        }
-
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
             return true;
@@ -110,7 +105,7 @@ public class HipChatNotifier extends Notifier {
 
         @Override
         public String getDisplayName() {
-            return "HipChatNotifier";
+            return "HipChat Notifier";
         }
 
         public FormValidation doCheckRoom(@QueryParameter String room) throws IOException, ServletException {
@@ -122,7 +117,6 @@ public class HipChatNotifier extends Notifier {
         @Override
         public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
             this.token = json.getString("token");
-            this.jenkinsUrl = json.getString("jenkins_url");
             save();
             return super.configure(req, json);
         }

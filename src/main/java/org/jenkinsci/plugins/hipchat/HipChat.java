@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.hipchat.client;
+package org.jenkinsci.plugins.hipchat;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
