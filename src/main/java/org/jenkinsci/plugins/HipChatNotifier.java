@@ -34,10 +34,26 @@ public class HipChatNotifier extends Notifier {
 
     public final String room;
     public final String messageFormat;
+    public final boolean postSuccess;
+    public final boolean notifySuccess;
+    public final boolean postFailed;
+    public final boolean notifyFailed;
 
     @DataBoundConstructor
-    public HipChatNotifier(String room, String messageFormat) {
+    public HipChatNotifier(
+            String room,
+            String messageFormat,
+            boolean postSuccess,
+            boolean notifySuccess,
+            boolean postFailed,
+            boolean notifyFailed
+    ) {
         this.room = room;
+        this.postSuccess = postSuccess;
+        this.notifySuccess = notifySuccess;
+        this.postFailed = postFailed;
+        this.notifyFailed = notifyFailed;
+
         if (messageFormat != null && messageFormat.length() > 0) {
             this.messageFormat = messageFormat;
         } else {
