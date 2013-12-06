@@ -45,7 +45,8 @@ public class HipChat {
 
     private String encode(String v) {
         try {
-            return URLEncoder.encode(v, "UTF-8");
+            return URLEncoder.encode(v, "UTF-8")
+                    .replaceAll("\\+", "%20");
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
