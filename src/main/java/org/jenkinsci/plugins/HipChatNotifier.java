@@ -30,19 +30,28 @@ import java.io.PrintStream;
  */
 public class HipChatNotifier extends Notifier {
 
-    private static final String NOTIFY_TEMPLATE = "${JOB_NAME} #${BUILD_NUMBER} (${BUILD_RESULT}) ${BUILD_URL}";
-
     public final String room;
     public final String messageFormat;
+    public final boolean postSuccess;
+    public final boolean notifySuccess;
+    public final boolean postFailed;
+    public final boolean notifyFailed;
 
     @DataBoundConstructor
-    public HipChatNotifier(String room, String messageFormat) {
+    public HipChatNotifier(
+            String room,
+            String messageFormat,
+            boolean postSuccess,
+            boolean notifySuccess,
+            boolean postFailed,
+            boolean notifyFailed
+    ) {
         this.room = room;
-        if (messageFormat != null && messageFormat.length() > 0) {
-            this.messageFormat = messageFormat;
-        } else {
-            this.messageFormat = NOTIFY_TEMPLATE;
-        }
+        this.postSuccess = postSuccess;
+        this.notifySuccess = notifySuccess;
+        this.postFailed = postFailed;
+        this.notifyFailed = notifyFailed;
+        this.messageFormat = messageFormat;
     }
 
     public String getRoom() {
@@ -54,6 +63,8 @@ public class HipChatNotifier extends Notifier {
         PrintStream logger = listener.getLogger();
         String token = this.getDescriptor().getToken();
 
+        System.out.println(token);
+        System.out.println(this.getRoom());
         if (token.length() > 0 && this.getRoom().length() > 0) {
             boolean notifyResult = new HipChat(token).notify(
                     this.getRoom(),
@@ -84,6 +95,7 @@ public class HipChatNotifier extends Notifier {
 
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+        private static final String NOTIFY_TEMPLATE = "${JOB_NAME} #${BUILD_NUMBER} (${BUILD_RESULT}) ${BUILD_URL}";
         private String token;
 
         /**
@@ -96,6 +108,22 @@ public class HipChatNotifier extends Notifier {
 
         public String getToken() {
             return token;
+        }
+
+        public String getDefaultMessageFormat() {
+            return NOTIFY_TEMPLATE;
+        }
+        public boolean getDefaultPostSuccess() {
+            return true;
+        }
+        public boolean getDefaultNotifySuccess() {
+            return true;
+        }
+        public boolean getDefaultPostFailed() {
+            return true;
+        }
+        public boolean getDefaultNotifyFailed() {
+            return true;
         }
 
         @Override
