@@ -96,7 +96,7 @@ public class HipChatNotifier extends Notifier {
                     getRoom(),
                     new NotifyMessage(
                             NotifyMessage.BackgroundColor.get(build.getResult().color),
-                            Macro.expand(messageFormat(build), build),
+                            Macro.expand(messageFormat(build), build, listener),
                             shouldNotify(build)
                     )
             );
