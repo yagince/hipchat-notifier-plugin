@@ -19,8 +19,7 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.servlet.ServletException;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +30,33 @@ import java.io.PrintStream;
  */
 public class HipChatNotifier extends Notifier {
 
+    public static class MessageFromFile {
+        public final String filePath;
+
+        @DataBoundConstructor
+        public MessageFromFile(String messageFilePath) {
+            this.filePath = messageFilePath;
+        }
+
+        public String readMessage(AbstractBuild build) throws IOException, InterruptedException {
+            if (this.filePath == null) {
+                return "";
+            }
+            BufferedReader reader = null;
+            StringBuilder value = new StringBuilder();
+            try {
+                reader = new BufferedReader(new FileReader(new File(build.getWorkspace().getRemote() + "/" + this.filePath)));
+                String buf;
+                while ((buf = reader.readLine()) != null) {
+                    value.append(buf);
+                }
+            } finally {
+              if (reader != null) reader.close();
+            }
+            return value.toString();
+        }
+    }
+
     public final String room;
     public final String successMessageFormat;
     public final String failedMessageFormat;
@@ -38,6 +64,7 @@ public class HipChatNotifier extends Notifier {
     public final boolean notifySuccess;
     public final boolean postFailed;
     public final boolean notifyFailed;
+    public final MessageFromFile messageFromFile;
 
     @DataBoundConstructor
     public HipChatNotifier(
@@ -47,7 +74,8 @@ public class HipChatNotifier extends Notifier {
             boolean postSuccess,
             boolean notifySuccess,
             boolean postFailed,
-            boolean notifyFailed
+            boolean notifyFailed,
+            MessageFromFile messageFromFile
     ) {
         this.room = room;
         this.postSuccess = postSuccess;
@@ -56,6 +84,7 @@ public class HipChatNotifier extends Notifier {
         this.notifyFailed = notifyFailed;
         this.successMessageFormat = successMessageFormat;
         this.failedMessageFormat = failedMessageFormat;
+        this.messageFromFile = messageFromFile;
     }
 
     public String getRoom() {
@@ -83,11 +112,25 @@ public class HipChatNotifier extends Notifier {
         }
     }
 
+    private String buildMessage(AbstractBuild build, BuildListener listener) throws IOException {
+        build.getWorkspace().getName();
+        PrintStream logger = listener.getLogger();
+        if (this.messageFromFile != null) {
+            try {
+                return this.messageFromFile.readMessage(build);
+            } catch (Exception e) {
+                logger.println(e.getMessage());
+            }
+        }
+        return Macro.expand(messageFormat(build), build, listener);
+    }
+
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
         String token = getDescriptor().getToken();
 
+        logger.println("HipChat Post   : " + shouldPost(build));
         logger.println("HipChat Post   : " + shouldPost(build));
         logger.println("HipChat Notify : " + shouldNotify(build));
 
@@ -96,7 +139,7 @@ public class HipChatNotifier extends Notifier {
                     getRoom(),
                     new NotifyMessage(
                             NotifyMessage.BackgroundColor.get(build.getResult().color),
-                            Macro.expand(messageFormat(build), build, listener),
+                            buildMessage(build, listener),
                             shouldNotify(build)
                     )
             );

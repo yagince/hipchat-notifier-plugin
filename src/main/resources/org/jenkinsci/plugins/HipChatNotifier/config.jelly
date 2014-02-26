@@ -8,6 +8,11 @@
   <f:entry title="Message Format (FAILED)" field="failedMessageFormat">
     <f:textbox default="${descriptor.defaultMessageFormat}"/>
   </f:entry>
+  <f:optionalBlock name="messageFromFile" title="Message from file" checked="${instance.messageFromFile != null}">
+    <f:entry title="file path" field="messageFilePath">
+       <f:textbox value="${instance.messageFromFile.filePath}"/>
+    </f:entry>
+  </f:optionalBlock>
   <f:advanced>
     <f:entry title="post success notification" field="postSuccess">
       <f:checkbox default="${descriptor.defaultPostSuccess}"/>
