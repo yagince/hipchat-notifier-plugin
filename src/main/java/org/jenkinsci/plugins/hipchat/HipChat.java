@@ -9,6 +9,7 @@ import org.apache.http.impl.client.HttpClients;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 
 /**
  * Created with IntelliJ IDEA.
@@ -29,7 +30,7 @@ public class HipChat {
         try {
             CloseableHttpClient client = HttpClients.createDefault();
             HttpPost post = new HttpPost(String.format(NOTIFY_URL, encode(room), encode(this.token)));
-            post.setEntity(new StringEntity(message.toJson().toString(), ContentType.create("application/json")));
+            post.setEntity(new StringEntity(message.toJson().toString(), ContentType.create("application/json", Charset.defaultCharset())));
             CloseableHttpResponse res = client.execute(post);
 
             if (res.getStatusLine().getStatusCode() > 400) {
