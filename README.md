@@ -8,13 +8,26 @@ What makes it different from other HipChat Jenkins Plugins (at least those I tri
 * can specify token created by room owner (no more HipChat admin required!),
 * can define token per job (no more global token for all jobs set by Jenkins Administrator!).
 
+## Install (Ubuntu)
+
+```
+sudo apt-get install openjdk-7-jdk maven2
+git clone git@github.com:havramar/hipchat-notifier-plugin.git
+cd hipchat-notifier-plugin
+mvn package
+```
+
+As a result `target/hipchat-notifier.hpi` should be created. To upload it to Jenkins:
+* run Jenkins (assuming it will run as http://localhost:8080),
+* visit [Plugins Manager (advanced)](http://localhost:8080/pluginManager/advanced)
+* Send plugin and Submit,
+* restart Jenkins.
+
 ## Configure
 
 ### Global Settings
 
 Manage Jenkins -> System Settings -> Hip Chat Notifier (section)
-
-1. API Token
   - your api token - https://{xxxx}.hipchat.com/account/api
 
 ### Job Settings
@@ -25,10 +38,9 @@ Job Page -> Configure -> Post-build Action (section) -> Add post-build action
 
 1. RoomName or RoomID
   - The name or id of the room which to notify
-  - Take a look at the Room's web page If you want to use the room id
 1. Auth token
-  - API Access,
-  - Room Notification,
+  - API Access (personal),
+  - Room Notification (created by room owner),
 1. Message Format (SUCCESS)
 1. Message Format (FAILED)
 1. Massage from file
