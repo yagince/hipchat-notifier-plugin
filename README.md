@@ -1,6 +1,12 @@
 # HipChatNotifier Plugin
 
-for HipChat API v2
+Uses HipChat API v2.
+
+What makes it different from other HipChat Jenkins Plugins (at least those I tried)?
+
+* it works :)
+* can specify token created by room owner (no more HipChat admin required!),
+* can define token per job (no more global token for all jobs set by Jenkins Administrator!).
 
 ## Configure
 
@@ -9,31 +15,33 @@ for HipChat API v2
 Manage Jenkins -> System Settings -> Hip Chat Notifier (section)
 
 1. API Token
-  - your api token
-  - see) https://{xxxx}.hipchat.com/account/api
+  - your api token - https://{xxxx}.hipchat.com/account/api
 
 ### Job Settings
 
 Job Page -> Configure -> Post-build Action (section) -> Add post-build action
 
-### normal
+### Normal
 
 1. RoomName or RoomID
   - The name or id of the room which to notify
   - Take a look at the Room's web page If you want to use the room id
-2. Message Format (SUCCESS)
-3. Message Format (FAILED)
-4. Massage from file
+1. Auth token
+  - API Access,
+  - Room Notification,
+1. Message Format (SUCCESS)
+1. Message Format (FAILED)
+1. Massage from file
   - Load notify message from file
   - ignore message format setting
 
-### advanced
+### Advanced
 
-5. post success notification
+1. post success notification
   - To set whether to notify if the build is successful
-6. success notification to notify:true
+1. success notification to notify:true
   - To set whether to notify parameter of success notification to true
-7. post failed notification
+1. post failed notification
   - To set whether to notify if the build is failed
-8. failed notification to notify:true
+1. failed notification to notify:true
   - To set whether to notify parameter of failed notification to true
