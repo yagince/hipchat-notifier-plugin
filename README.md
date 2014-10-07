@@ -2,9 +2,9 @@
 
 Uses HipChat API v2.
 
-What makes it different from other HipChat Jenkins Plugins (at least those I tried)?
+What makes it different from other HipChat Jenkins Plugins?
 
-* it works :)
+* it works because it uses latest HipChat APIv2 :)
 * can specify token created by room owner (no more HipChat admin required!),
 * can define token per job (no more global token for all jobs set by Jenkins Administrator!).
 
