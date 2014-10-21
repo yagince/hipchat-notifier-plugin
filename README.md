@@ -8,6 +8,10 @@ What makes it different from other HipChat Jenkins Plugins?
 * can specify token created by room owner (no more HipChat admin required!),
 * can define token per job (no more global token for all jobs set by Jenkins Administrator!).
 
+## Download plugin
+
+If you don't want to compile plugin yourself, feel free to download [latest pre-compiled version](https://github.com/havramar/hipchat-notifier-plugin/releases/latest) (pick `hipchat-notifier.hpi`) and go to [uploading instructions](#upload-plugin).
+
 ## Install (Ubuntu)
 
 ```
@@ -17,10 +21,14 @@ cd hipchat-notifier-plugin
 mvn package
 ```
 
-As a result `target/hipchat-notifier.hpi` should be created. To upload it to Jenkins:
+As a result `target/hipchat-notifier.hpi` should be created. 
+
+## <a name="upload-plugin"></a> Upload plugin to Jenkins
+
+To upload it to Jenkins:
 * run Jenkins (assuming it will run as http://localhost:8080),
 * visit [Plugins Manager (advanced)](http://localhost:8080/pluginManager/advanced)
-* Send plugin and Submit,
+* pick path to plugin and submit,
 * restart Jenkins.
 
 ## Configure
