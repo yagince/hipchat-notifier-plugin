@@ -19,17 +19,19 @@ import java.nio.charset.Charset;
  * To change this template use File | Settings | File Templates.
  */
 public class HipChat {
-    private static final String NOTIFY_URL = "https://api.hipchat.com/v2/room/%s/notification?auth_token=%s"; // TODO: config
+    private static final String NOTIFY_URL = "%s/v2/room/%s/notification?auth_token=%s";
     private final String token;
+    private final String server;
 
-    public HipChat(String token) {
+    public HipChat(String token, String server) {
         this.token = token;
+        this.server = server;
     }
 
     public boolean notify(String room, NotifyMessage message) {
         try {
             CloseableHttpClient client = HttpClients.createDefault();
-            HttpPost post = new HttpPost(String.format(NOTIFY_URL, encode(room), encode(this.token)));
+            HttpPost post = new HttpPost(String.format(NOTIFY_URL, this.server, encode(room), encode(this.token)));
             post.setEntity(new StringEntity(message.toJson().toString(), ContentType.create("application/json", Charset.defaultCharset())));
             CloseableHttpResponse res = client.execute(post);
 
