@@ -131,6 +131,7 @@ public class HipChatNotifier extends Notifier {
     @Override
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
+        String server = getDescriptor().getServer();
         String token = getDescriptor().getToken();
 
         if (this.jobToken.length() > 0) {
@@ -142,7 +143,7 @@ public class HipChatNotifier extends Notifier {
         logger.println("HipChat Notify : " + shouldNotify(build));
 
         if (token.length() > 0 && getRoom().length() > 0 && shouldPost(build)) {
-            boolean notifyResult = new HipChat(token).notify(
+            boolean notifyResult = new HipChat(token, server).notify(
                     getRoom(),
                     new NotifyMessage(
                             NotifyMessage.BackgroundColor.get(build.getResult().color),
@@ -173,6 +174,7 @@ public class HipChatNotifier extends Notifier {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
         private static final String NOTIFY_TEMPLATE = "${JOB_NAME} #${BUILD_NUMBER} (${BUILD_RESULT}) ${BUILD_URL}";
+        private String server;
         private String token;
 
         /**
@@ -185,6 +187,10 @@ public class HipChatNotifier extends Notifier {
 
         public String getToken() {
             return token;
+        }
+        
+        public String getServer() {
+            return server;
         }
 
         public String getDefaultMessageFormat() {
@@ -221,6 +227,7 @@ public class HipChatNotifier extends Notifier {
 
         @Override
         public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+            this.server = json.getString("server");
             this.token = json.getString("token");
             save();
             return super.configure(req, json);
