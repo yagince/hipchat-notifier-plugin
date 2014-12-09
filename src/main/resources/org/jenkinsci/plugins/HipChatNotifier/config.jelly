@@ -2,6 +2,9 @@
   <f:entry title="RoomName or RoomID" field="room">
     <f:textbox />
   </f:entry>
+  <f:entry title="Auth token" field="jobToken">
+      <f:textbox />
+  </f:entry>
   <f:entry title="Message Format (SUCCESS)" field="successMessageFormat">
     <f:textbox default="${descriptor.defaultMessageFormat}"/>
   </f:entry>

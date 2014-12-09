@@ -58,6 +58,7 @@ public class HipChatNotifier extends Notifier {
     }
 
     public final String room;
+    public final String jobToken;
     public final String successMessageFormat;
     public final String failedMessageFormat;
     public final boolean postSuccess;
@@ -69,6 +70,7 @@ public class HipChatNotifier extends Notifier {
     @DataBoundConstructor
     public HipChatNotifier(
             String room,
+            String jobToken,
             String successMessageFormat,
             String failedMessageFormat,
             boolean postSuccess,
@@ -78,6 +80,7 @@ public class HipChatNotifier extends Notifier {
             MessageFromFile messageFromFile
     ) {
         this.room = room;
+        this.jobToken = jobToken;
         this.postSuccess = postSuccess;
         this.notifySuccess = notifySuccess;
         this.postFailed = postFailed;
@@ -129,6 +132,10 @@ public class HipChatNotifier extends Notifier {
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         PrintStream logger = listener.getLogger();
         String token = getDescriptor().getToken();
+
+        if (this.jobToken.length() > 0) {
+            token = this.jobToken;
+        }
 
         logger.println("HipChat Post   : " + shouldPost(build));
         logger.println("HipChat Post   : " + shouldPost(build));
