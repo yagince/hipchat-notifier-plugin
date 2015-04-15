@@ -10,7 +10,7 @@ What makes it different from other HipChat Jenkins Plugins?
 
 ## Download plugin
 
-If you don't want to compile plugin yourself, feel free to download [latest pre-compiled version](https://github.com/havramar/hipchat-notifier-plugin/releases/latest) (pick `hipchat-notifier.hpi`) and go to [uploading instructions](#upload-plugin).
+If you don't want to compile plugin yourself, feel free to download [latest pre-compiled version](https://github.com/yagince/hipchat-notifier-plugin/releases/latest) (pick `hipchat-notifier.hpi`) and go to [uploading instructions](#upload-plugin).
 
 ## Compile plugin (Ubuntu)
 
